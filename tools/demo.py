@@ -92,8 +92,8 @@ def demo(net, image_name, classes):
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
     # Visualize detections for each class
-    CONF_THRESH = 0.8
-    NMS_THRESH = 0.3
+    CONF_THRESH = 0.01
+    NMS_THRESH = 0.01
     for cls in classes:
         cls_ind = CLASSES.index(cls)
         cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
@@ -117,6 +117,9 @@ def parse_args():
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
                         choices=NETS.keys(), default='vgg16')
 
+    parser.add_argument('--filename', dest='filename', help='Filename of the image')
+    parser.add_argument('--category', dest='category', help='Category')
+
     args = parser.parse_args()
 
     return args
@@ -133,6 +136,9 @@ if __name__ == '__main__':
         raise IOError(('{:s} not found.\nDid you run ./data/script/'
                        'fetch_fast_rcnn_models.sh?').format(caffemodel))
 
+    # Default to cpu mode
+    caffe.set_mode_cpu()
+
     if args.cpu_mode:
         caffe.set_mode_cpu()
     else:
@@ -142,6 +148,10 @@ if __name__ == '__main__':
 
     print '\n\nLoaded network {:s}'.format(caffemodel)
 
+    print 'Processing data/demo/', args.filename, '.jpg --- ', args.category
+    demo(net, args.filename, (args.category,))
+
+    '''
     print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
     print 'Demo for data/demo/000004.jpg'
     demo(net, '000004', ('car',))
@@ -149,5 +159,6 @@ if __name__ == '__main__':
     print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
     print 'Demo for data/demo/001551.jpg'
     demo(net, '001551', ('sofa', 'tvmonitor'))
+    '''
 
     plt.show()
